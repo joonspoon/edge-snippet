@@ -1,0 +1,17 @@
+{
+  "name": "edge-snippet",
+  "version": "1.0.0",
+  "description": "Connects to Uniswap Smart Contract from React",
+  "main": "index.js",
+  "type": "module",
+  "repository": "https://github.com/joonspoon/edge-snippet",
+  "author": "joonspoon",
+  "scripts": {
+    "swap": "node src/connect.js"
+  },
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "ethers": "^5.5.1"
+  }
+}
