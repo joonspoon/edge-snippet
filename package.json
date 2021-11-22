@@ -7,11 +7,13 @@
   "repository": "https://github.com/joonspoon/edge-snippet",
   "author": "joonspoon",
   "scripts": {
-    "swap": "node src/connect.js"
+    "collect": "node src/connect.js",
+    "swap": "node src/swap.js"
   },
   "license": "MIT",
   "private": false,
   "dependencies": {
+    "@uniswap/sdk": "^3.0.3",
     "ethers": "^5.5.1"
   }
 }
