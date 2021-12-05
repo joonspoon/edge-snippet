@@ -1,8 +1,11 @@
 # Pre-requisites
 - Node.js v14+
 
-# Install dependencies
+# Run a swap from the command line
 ```
-npm install ethers
 yarn run swap
+```
+# Run as React app
+```
+yarn start
 ```
