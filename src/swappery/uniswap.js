@@ -1,6 +1,5 @@
 import { EdgeSwapRequest, SwapCurrencyError, EdgeCurrencyWallet } from './edgery.js';
 import { ChainId, Token, Fetcher, Route, Trade, TokenAmount, TradeType } from "@uniswap/sdk";
-import proxyContractInterface from './Swap.json';
 import { ethers } from "ethers";
 import * as Utils from './utils.js';
 
