@@ -1,53 +1,92 @@
 import React, { Component } from "react";
 import logo from "./uni.png";
 import './App.css';
-import { EdgeCurrencyWallet } from './swappery/edgery.js';
+import "antd/dist/antd.css";
+import { EdgeCurrencyWallet, currencyInfo } from './swappery/edgery.js';
 import * as UniswapPlugin from './swappery/uniswap.js';
 import { ethers } from "ethers";
+import * as Utils from './swappery/utils.js';
+import { Select, Button } from 'antd';
+
+const { Option } = Select;
+
+const rawKeys:JsonObject = {
+  ethereumKey: Utils.getTestPrivateKey(),
+}
+
+const ethWallet: EdgeCurrencyWallet = {
+  id: 'uni-magic',
+  keys: rawKeys.ethereumKey,
+  type: 'wallet:ethereum'
+}
 
 class App extends Component {
   constructor() {
     super();
-    this.state = { data: [] };
+    this.state = {
+      data: [],
+      sourceAsset: 'DAI',
+      destinationAsset: 'WBTC',
+      errorMessage: ''
+    };
   }
 
-  async componentDidMount() {
+   updateDest(value){
+     this.setState({destinationAsset: value})
+   }
 
-    const edgeWallet: EdgeCurrencyWallet = {
-      id: 'string',
-    //  +keys: JsonObject,
-      type: ''
-    }
+   updateSource(value){
+     this.setState({sourceAsset: value})
+   }
 
-    //console.log(ethers.utils.parseEther("0.1").toString());
+   async getQuote(){
+     this.setState({errorMessage: ''})
 
-    const swapRequest: EdgeSwapRequest = {
-      // Where?
-      fromWallet: edgeWallet,
-      toWallet: edgeWallet,
+     const swapRequest: EdgeSwapRequest = {
+       // Where?
+       fromWallet: ethWallet,
+       toWallet: ethWallet,
 
-      // What?
-      fromCurrencyCode: 'WETH',
-      toCurrencyCode: 'DAI',
+       // What?
+       fromCurrencyCode: this.state.sourceAsset,
+       toCurrencyCode: this.state.destinationAsset,
 
-      // How much?
-      nativeAmount: '100000000000000000',
-      quoteFor: 'from'
-    }
+       // How much?
+       nativeAmount: '100000000000000000',
+       quoteFor: 'from'
+     }
 
-    const result = await UniswapPlugin.fetchSwapQuote();
-    this.setState({ data: result });
-    console.log(result);
-  }
+     UniswapPlugin.fetchSwapQuote(swapRequest)
+      .then(result => this.setState({ data: result }))
+      .catch (error => {
+        this.setState({ errorMessage: error.message })
+        this.setState({ data: '?' })
+      })
+
+   }
 
   render() {
+    const tokenList = currencyInfo.metaTokens.map(token => {
+      return <Option key={token.currencyCode}>{ token.currencyName + " - " + token.currencyCode}</Option>;
+    });
+
     return (
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            {this.state.data}
-          </p>
-        </header>
+      <React.Fragment>
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          1 {this.state.sourceAsset} = {this.state.data} {this.state.destinationAsset}
+        </p>
+        <Select defaultValue={this.state.sourceAsset} onChange={this.updateSource.bind(this)}>
+          {tokenList}
+        </Select>
+        <Select defaultValue={this.state.destinationAsset}  onChange={this.updateDest.bind(this)}>
+          {tokenList}
+        </Select>
+        <Button style={{background: 'HotPink'}} onClick={this.getQuote.bind(this)}>Get Quote</Button>
+        {this.state.errorMessage}
+      </header>
+    </React.Fragment>
     );
   }
 }
