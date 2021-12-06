@@ -14,9 +14,11 @@ const rawKeys:JsonObject = {
   ethereumKey: Utils.getTestPrivateKey(),
 }
 
+const amountToSwap = ethers.utils.parseEther("100");
+
 const ethWallet: EdgeCurrencyWallet = {
   id: 'uni-magic',
-  keys: rawKeys.ethereumKey,
+  keys: rawKeys,
   type: 'wallet:ethereum'
 }
 
@@ -24,9 +26,10 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      data: [],
+      quote: '',
+      swapStatus: '',
       sourceAsset: 'DAI',
-      destinationAsset: 'WBTC',
+      destinationAsset: 'WETH',
       errorMessage: ''
     };
   }
@@ -39,25 +42,37 @@ class App extends Component {
      this.setState({sourceAsset: value})
    }
 
-   async getQuote(){
+   async swap(){
      this.setState({errorMessage: ''})
+     this.setState({swapStatus: ''})
 
      const swapRequest: EdgeSwapRequest = {
-       // Where?
        fromWallet: ethWallet,
-       toWallet: ethWallet,
-
-       // What?
        fromCurrencyCode: this.state.sourceAsset,
        toCurrencyCode: this.state.destinationAsset,
+       nativeAmount: amountToSwap,
+     }
 
-       // How much?
-       nativeAmount: '100000000000000000',
-       quoteFor: 'from'
+     UniswapPlugin.performSwap(swapRequest)
+      .then(result => this.setState({ swapStatus: result}))
+      .catch (error => {
+        this.setState({ errorMessage: error.message })
+        this.setState({ data: '?' })
+      })
+   }
+
+   async getQuote(){
+     this.setState({errorMessage: ''})
+     this.setState({swapStatus: ''})
+
+     const swapRequest: EdgeSwapRequest = {
+       fromCurrencyCode: this.state.sourceAsset,
+       toCurrencyCode: this.state.destinationAsset,
+       nativeAmount: amountToSwap,
      }
 
      UniswapPlugin.fetchSwapQuote(swapRequest)
-      .then(result => this.setState({ data: result }))
+      .then(result => this.setState({ quote: result }))
       .catch (error => {
         this.setState({ errorMessage: error.message })
         this.setState({ data: '?' })
@@ -66,25 +81,29 @@ class App extends Component {
    }
 
   render() {
-    const tokenList = currencyInfo.metaTokens.map(token => {
-      return <Option key={token.currencyCode}>{ token.currencyName + " - " + token.currencyCode}</Option>;
-    });
+    const tokenList = currencyInfo.metaTokens
+      .filter(token => token.rinkebyAddress)
+      .map(token => {
+        return <Option key={token.currencyCode}>{ token.currencyName + " - " + token.currencyCode}</Option>;
+      });
 
     return (
       <React.Fragment>
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          1 {this.state.sourceAsset} = {this.state.data} {this.state.destinationAsset}
+          1 {this.state.sourceAsset} = {this.state.quote} {this.state.destinationAsset}
         </p>
         <Select defaultValue={this.state.sourceAsset} onChange={this.updateSource.bind(this)}>
           {tokenList}
         </Select>
-        <Select defaultValue={this.state.destinationAsset}  onChange={this.updateDest.bind(this)}>
+        <Select defaultValue={this.state.destinationAsset} onChange={this.updateDest.bind(this)}>
           {tokenList}
         </Select>
         <Button style={{background: 'HotPink'}} onClick={this.getQuote.bind(this)}>Get Quote</Button>
+        <Button style={{background: 'HotPink'}} onClick={this.swap.bind(this)}>Swap</Button>
         {this.state.errorMessage}
+        {this.state.swapStatus ? <a href={this.state.swapStatus}>etherscan</a>:''}
       </header>
     </React.Fragment>
     );

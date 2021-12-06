@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 // import fs from 'fs';
 import secrets from './secrets.json';
+import { EdgeSwapRequest, currencyInfo, SwapCurrencyError, EdgeCurrencyWallet } from './edgery.js';
 
 export function getPrivateKeyFromSeedPhrase(mnemonic){
   let mnemonicWallet = ethers.Wallet.fromMnemonic(mnemonic);
@@ -27,4 +28,12 @@ export function getWallet(){
   const secrets = JSON.parse(fs.readFileSync('../proxy-contract/secrets.json', 'utf8'));
   let privateKey = getPrivateKeyFromSeedPhrase(secrets.seedPhrase);
   return new ethers.Wallet(privateKey, provider);
+}
+
+export function getRinkebyAddressFromCurrencyCode(currencyCode: string) {
+  return currencyInfo.metaTokens.find(token => token.currencyCode == currencyCode).rinkebyAddress;
+}
+
+export function getAddressFromCurrencyCode(currencyCode: string) {
+  return currencyInfo.metaTokens.find(token => token.currencyCode == currencyCode).contractAddress;
 }
