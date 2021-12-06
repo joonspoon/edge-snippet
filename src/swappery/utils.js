@@ -1,9 +1,14 @@
 import { ethers } from "ethers";
-import fs from 'fs';
+// import fs from 'fs';
+import secrets from './secrets.json';
 
 export function getPrivateKeyFromSeedPhrase(mnemonic){
   let mnemonicWallet = ethers.Wallet.fromMnemonic(mnemonic);
   return mnemonicWallet.privateKey;
+}
+
+export function getTestPrivateKey(){
+  return getPrivateKeyFromSeedPhrase(secrets.seedPhrase);
 }
 
 export async function approveTokenForSpend(tokenAddress, amount, wallet){
