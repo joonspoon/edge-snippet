@@ -141,7 +141,8 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x6B175474E89094C44Da98b954EedeAC495271d0F'
+      contractAddress: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+      rinkebyAddress: '0xc3dbf84abb494ce5199d5d4d815b10ec29529ff8'
     },
     {
       currencyCode: 'SAI',
@@ -372,7 +373,8 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2'
+      contractAddress: '0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2',
+      rinkebyAddress: '0xf9ba5210f91d0474bd1e1dcdaec4c58e359aad85'
     },
     {
       currencyCode: 'GUSD',
@@ -460,7 +462,8 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x514910771af9ca656af840dff83e8264ecf986ca'
+      contractAddress: '0x514910771af9ca656af840dff83e8264ecf986ca',
+      rinkebyAddress: '0x01be23585060835e02b77ef475b0cc51aa1e0709'
     },
     {
       currencyCode: 'BRZ',
@@ -1010,7 +1013,8 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+      contractAddress: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+      rinkebyAddress: '0xc778417e063141139fce010982780140aa0cd5ab'
     },
     {
       currencyCode: 'RENBTC',
@@ -1142,7 +1146,8 @@ export const currencyInfo: EdgeCurrencyInfo = {
           multiplier: '1000000000000000000'
         }
       ],
-      contractAddress: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984'
+      contractAddress: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
+      rinkebyAddress: '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984'
     }
   ]
 }
