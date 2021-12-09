@@ -32,7 +32,7 @@ export async function fetchSwapQuote(swapRequest: EdgeSwapRequest): Promise<stri
   }
 }
 
-export async function performSwap(swapRequest: EdgeSwapRequest): Promise<string> {
+export async function performSwap(swapRequest: EdgeSwapRequest, gasBudget: number): Promise<string> {
   const proxyContractAddress = '0x4e127a4E9b1Fec0D6c4b27402Fdd3313E4833fFD'; //Rinkeby testnet
   const proxyContractInterface = [
     "function swap(address _tokenIn, address _tokenOut, uint _amountIn, uint _amountOutMin, address _to)"
@@ -46,8 +46,13 @@ export async function performSwap(swapRequest: EdgeSwapRequest): Promise<string>
   const destinationTokenAddress = Utils.getRinkebyAddressFromCurrencyCode(swapRequest.toCurrencyCode);
   let amountToSwap = ethers.utils.parseEther("0.1");
 
-  await Utils.approveTokenForSpend(sourceTokenAddress, swapRequest.nativeAmount, ethersWallet);
-  var gasOptions = { gasPrice: 1000000000, gasLimit: 250000};
+  const gasUsedByApproval = await Utils.approveTokenForSpend(sourceTokenAddress, swapRequest.nativeAmount, ethersWallet);
+  gasBudget -= gasUsedByApproval;
+
+  console.log("setting gas limit to: " +  gasBudget);
+  console.log("gas left after approval: " + gasBudget.toString());
+
+  var gasOptions = { gasPrice: 1000000000, gasLimit: gasBudget};
   const swapResult = await signedContract.swap(sourceTokenAddress, destinationTokenAddress, swapRequest.nativeAmount, 10, ethersWallet.address, gasOptions);
   const { hash } = swapResult;
   const transactionURL = "https://rinkeby.etherscan.io/tx/" + hash;

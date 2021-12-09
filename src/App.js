@@ -14,7 +14,9 @@ const rawKeys:JsonObject = {
   ethereumKey: Utils.getTestPrivateKey(),
 }
 
-const amountToSwap = ethers.utils.parseEther("100");
+const amountToSwap = ethers.utils.parseEther("10");
+const currentGasPriceInGWEI = 1;
+const priceOfETH = 4200;
 
 const ethWallet: EdgeCurrencyWallet = {
   id: 'uni-magic',
@@ -30,7 +32,8 @@ class App extends Component {
       swapStatus: '',
       sourceAsset: 'DAI',
       destinationAsset: 'WETH',
-      errorMessage: ''
+      errorMessage: '',
+      gas: 0
     };
   }
 
@@ -53,12 +56,13 @@ class App extends Component {
        nativeAmount: amountToSwap,
      }
 
-     UniswapPlugin.performSwap(swapRequest)
+     UniswapPlugin.performSwap(swapRequest, this.state.gas)
       .then(result => this.setState({ swapStatus: result}))
       .catch (error => {
         this.setState({ errorMessage: error.message })
         this.setState({ data: '?' })
       })
+
    }
 
    async getQuote(){
@@ -78,6 +82,8 @@ class App extends Component {
         this.setState({ data: '?' })
       })
 
+      const costOfSwap = Utils.calculateTransactionCost(currentGasPriceInGWEI);
+      this.setState({ gas: costOfSwap });
    }
 
   render() {
@@ -93,6 +99,9 @@ class App extends Component {
         <img src={logo} className="App-logo" alt="logo" />
         <p>
           1 {this.state.sourceAsset} = {this.state.quote} {this.state.destinationAsset}
+        </p>
+        <p>
+          Gas {this.state.gas} GWEI / {this.state.gas/1000000000} ETH / ${this.state.gas/1000000000*priceOfETH}
         </p>
         <Select defaultValue={this.state.sourceAsset} onChange={this.updateSource.bind(this)}>
           {tokenList}
