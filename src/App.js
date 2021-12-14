@@ -14,14 +14,15 @@ const rawKeys:JsonObject = {
   ethereumKey: Utils.getTestPrivateKey(),
 }
 
-const amountToSwap = ethers.utils.parseEther("10");
+const amountToSwap = ethers.utils.parseEther("100");
 const currentGasPriceInGWEI = 1;
 const priceOfETH = 4200;
 
 const ethWallet: EdgeCurrencyWallet = {
   id: 'uni-magic',
   keys: rawKeys,
-  type: 'wallet:ethereum'
+  type: 'wallet:ethereum',
+  address: '0xeBf5C62481B5F65E5994317cE7EB71AafE82E8bb'
 }
 
 class App extends Component {
@@ -62,6 +63,13 @@ class App extends Component {
         this.setState({ errorMessage: error.message })
         this.setState({ data: '?' })
       })
+
+     // UniswapPlugin.withdrawFees(ethWallet)
+     //  .then(result => this.setState({ swapStatus: result}))
+     //  .catch (error => {
+     //    this.setState({ errorMessage: error.message })
+     //    this.setState({ data: '?' })
+     //  })
 
    }
 

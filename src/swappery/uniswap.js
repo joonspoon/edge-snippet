@@ -3,10 +3,9 @@ import { ChainId, Token, Fetcher, Route, Trade, TokenAmount, TradeType } from "@
 import { ethers } from "ethers";
 import * as Utils from './utils.js';
 
-import * as Token1 from './tokenAddresses.js';
-
 const chainId = ChainId.Rinkeby;
 const rinkebyProvider = ethers.providers.getDefaultProvider('rinkeby');
+const proxyContractAddress = '0x84F4d73e9D679fc487cC819f02069096b4aBE210'; //Rinkeby testnet
 
 export async function fetchSwapQuote(swapRequest: EdgeSwapRequest): Promise<string> {//EdgeSwapPluginQuote
   // const chainId = ChainId.MAINNET;
@@ -33,7 +32,6 @@ export async function fetchSwapQuote(swapRequest: EdgeSwapRequest): Promise<stri
 }
 
 export async function performSwap(swapRequest: EdgeSwapRequest, gasBudget: number): Promise<string> {
-  const proxyContractAddress = '0x4e127a4E9b1Fec0D6c4b27402Fdd3313E4833fFD'; //Rinkeby testnet
   const proxyContractInterface = [
     "function swap(address _tokenIn, address _tokenOut, uint _amountIn, uint _amountOutMin, address _to)"
   ];
@@ -44,19 +42,31 @@ export async function performSwap(swapRequest: EdgeSwapRequest, gasBudget: numbe
 
   const sourceTokenAddress = Utils.getRinkebyAddressFromCurrencyCode(swapRequest.fromCurrencyCode);
   const destinationTokenAddress = Utils.getRinkebyAddressFromCurrencyCode(swapRequest.toCurrencyCode);
-  let amountToSwap = ethers.utils.parseEther("0.1");
 
   const gasUsedByApproval = await Utils.approveTokenForSpend(sourceTokenAddress, swapRequest.nativeAmount, ethersWallet);
+  console.log("gasUsedByApproval", gasUsedByApproval.toString());
   gasBudget -= gasUsedByApproval;
-
-  console.log("setting gas limit to: " +  gasBudget);
   console.log("gas left after approval: " + gasBudget.toString());
 
   var gasOptions = { gasPrice: 1000000000, gasLimit: gasBudget};
   const swapResult = await signedContract.swap(sourceTokenAddress, destinationTokenAddress, swapRequest.nativeAmount, 10, ethersWallet.address, gasOptions);
   const { hash } = swapResult;
   const transactionURL = "https://rinkeby.etherscan.io/tx/" + hash;
-  // console.log(swapResult);
-  //window.open(transactionURL);
   return transactionURL;
+}
+
+export async function withdrawFees(edgeWallet: EdgeCurrencyWallet): Promise<string> {
+  const proxyContractInterface = [
+    "function withdrawFees(address _token, address _recipient) external"
+  ];
+
+  const ethersWallet = new ethers.Wallet(edgeWallet.keys.ethereumKey, rinkebyProvider);
+  const signedContract = new ethers.Contract(proxyContractAddress, proxyContractInterface, ethersWallet);
+
+  const daiAddress = Utils.getRinkebyAddressFromCurrencyCode("DAI");
+  var gasOptions = { gasPrice: 1000000000, gasLimit: 100000};
+
+  const result = await signedContract.withdrawFees(daiAddress, edgeWallet.address, gasOptions);
+  const { hash } = result;
+  return "https://rinkeby.etherscan.io/tx/" + hash;
 }

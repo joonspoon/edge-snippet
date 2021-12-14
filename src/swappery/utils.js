@@ -12,13 +12,13 @@ export function getTestPrivateKey(){
   return getPrivateKeyFromSeedPhrase(secrets.seedPhrase);
 }
 
-export async function approveTokenForSpend(tokenAddress, amount, wallet){
+export async function approveTokenForSpend(tokenAddress, amount, wallet) {
   const abi = [
     "function approve(address spender, uint256 amount) external returns (bool)"
   ];
   const provider = ethers.providers.getDefaultProvider('rinkeby');// can provider be gotten from wallet?
   const tokenContract = new ethers.Contract(tokenAddress, abi, wallet);
-  const proxyContractAddress = '0x4e127a4E9b1Fec0D6c4b27402Fdd3313E4833fFD'; //Rinkeby testnet
+  const proxyContractAddress = '0x84F4d73e9D679fc487cC819f02069096b4aBE210'; //Rinkeby testnet
   const transactionResponse = await tokenContract.approve(proxyContractAddress, amount);
   const { gasLimit } = transactionResponse;
   return gasLimit;
@@ -42,6 +42,6 @@ export function getAddressFromCurrencyCode(currencyCode: string) {
 
 export function calculateTransactionCost(gasPriceInGwei: number){
   const costOfApproval = 26256;
-  const costOfSwap = 140644;
+  const costOfSwap = 134715;
   return (costOfApproval + costOfSwap + 40000)*gasPriceInGwei;
 }
