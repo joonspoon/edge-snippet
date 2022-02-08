@@ -33,7 +33,7 @@ export async function fetchSwapQuote(swapRequest: EdgeSwapRequest): Promise<stri
 
 export async function performSwap(swapRequest: EdgeSwapRequest, gasBudget: number): Promise<string> {
   const proxyContractInterface = [
-    "function swap(address _tokenIn, address _tokenOut, uint _amountIn, uint _amountOutMin, address _to)"
+    "function swapFromERC20(address _tokenIn, address _tokenOut, uint _amountIn, uint _amountOutMin)"
   ];
 
   const edgeWallet: EdgeCurrencyWallet = swapRequest.fromWallet;
@@ -49,7 +49,8 @@ export async function performSwap(swapRequest: EdgeSwapRequest, gasBudget: numbe
   console.log("gas left after approval: " + gasBudget.toString());
 
   var gasOptions = { gasPrice: 1000000000, gasLimit: gasBudget};
-  const swapResult = await signedContract.swap(sourceTokenAddress, destinationTokenAddress, swapRequest.nativeAmount, 10, ethersWallet.address, gasOptions);
+  const minimumAmount = 0;  //TODO: pull this from the quote
+  const swapResult = await signedContract.swapFromERC20(sourceTokenAddress, destinationTokenAddress, swapRequest.nativeAmount, minimumAmount, gasOptions);
   const { hash } = swapResult;
   const transactionURL = "https://rinkeby.etherscan.io/tx/" + hash;
   return transactionURL;
